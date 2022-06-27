@@ -11,6 +11,9 @@ public class MobBehaviour : MonoBehaviour
     Collider2D otherObj = null;
     public Animator animator;
     int dirValue = 1;
+    public GameObject loot;
+    public int Gold;
+    public int xp;
 
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -46,5 +49,10 @@ public class MobBehaviour : MonoBehaviour
                 dir = Vector2.right;
                 sr.flipX = false;
             }
+    }
+
+    public void dropLoot()
+    {
+        Instantiate(loot, transform.position, Quaternion.identity);
     }
 }

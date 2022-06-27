@@ -51,6 +51,11 @@ public class HeroFightScript : MonoBehaviour
             enemy.SetActive(false);
             baseEnemy.SetActive(false);
             yield return new WaitForSeconds(0.6f);
+            MobBehaviour mb = baseEnemy.GetComponent<MobBehaviour>();
+            if(mb.loot != null)
+            {
+                mb.dropLoot();
+            }
             camFight.SetActive(false);
         }
         else

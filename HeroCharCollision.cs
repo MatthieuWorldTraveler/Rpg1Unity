@@ -13,7 +13,8 @@ public class HeroCharCollision : MonoBehaviour
     public GameObject dialCanvas;
     public Text dialcanvasTxt;
     public GameObject camFight;
-   
+    MobBehaviour mb;
+
 
 
     void OnTriggerEnter2D(Collider2D other)
@@ -38,10 +39,19 @@ public class HeroCharCollision : MonoBehaviour
             PnjSmiley smiley = other.gameObject.GetComponent<PnjSmiley>();
             smiley.Smiley.SetActive(true);
         }
-        if (other.gameObject.tag == "mob")
+        if (other.gameObject.tag == "mob" && !camFight.activeInHierarchy)
         {
             print("Combat !");
+            mb = other.gameObject.GetComponent<MobBehaviour>();
             camFight.SetActive(true);
+            InitFight initF = camFight.GetComponent<InitFight>();
+            initF.hfs.baseEnemy = other.gameObject;
+            initF.initFight();
+        }
+        if (other.gameObject.tag == "LootBag")
+        {
+            otherObj = other;
+            otherObj.gameObject.transform.GetChild(0).gameObject.SetActive(true);
         }
     }
 
@@ -82,6 +92,10 @@ public class HeroCharCollision : MonoBehaviour
             PnjSmiley smiley = other.gameObject.GetComponent<PnjSmiley>();
             smiley.Smiley.SetActive(false);
         }
+        if (other.gameObject.tag == "LootBag")
+        {
+            otherObj.gameObject.transform.GetChild(0).gameObject.SetActive(false);
+        }
 
     }
 
@@ -98,7 +112,12 @@ public class HeroCharCollision : MonoBehaviour
             {
                 otherObj.gameObject.transform.GetChild(0).gameObject.SetActive(false);
                 ShowDial();
-            }           
+            }
+            if (otherObj.gameObject.tag == "LootBag")
+            {
+                otherObj.gameObject.transform.GetChild(0).gameObject.SetActive(false);
+                ShowLoot();
+            }
         }
     }
 
@@ -107,5 +126,12 @@ public class HeroCharCollision : MonoBehaviour
         SignBehaviour sb = otherObj.gameObject.GetComponent<SignBehaviour>();
         dialTxt.SetText(sb.signText);
         dialWorldSpace.SetActive(true);
+    }
+
+    public void ShowLoot()
+    {
+        dialTxt.SetText($"Vous trouvez {mb.Gold} Pièces d'or et {mb.xp} points d'expériences !");
+        dialWorldSpace.SetActive(true);
+        Invoke("HideDialPanel", 2);
     }
 }

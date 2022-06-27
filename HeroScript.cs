@@ -14,16 +14,25 @@ public class HeroScript : MonoBehaviour
 
     public SpriteRenderer spriteRenderer;
 
+    HeroCharCollision hcc;
+
 
     Vector2 dir;
     int dirValue = 0; // 0 idle, 1 down 2 side 3 up
-    
+
+    private void Start()
+    {
+        hcc = gameObject.GetComponent<HeroCharCollision>();
+    }
 
     // Update is called once per frame
     void Update()
     {
-        HandleKeys();
-        HandleMove();
+        if (!hcc.camFight.activeInHierarchy)
+        {
+            HandleKeys();
+            HandleMove();
+        }
     }
 
     public void HandleKeys()
