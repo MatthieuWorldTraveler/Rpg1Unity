@@ -12,6 +12,7 @@ public class HeroCharCollision : MonoBehaviour
     public SpriteRenderer spriteRenderer;
     public GameObject dialCanvas;
     public Text dialcanvasTxt;
+    public GameObject camFight;
    
 
 
@@ -40,6 +41,7 @@ public class HeroCharCollision : MonoBehaviour
         if (other.gameObject.tag == "mob")
         {
             print("Combat !");
+            camFight.SetActive(true);
         }
     }
 
