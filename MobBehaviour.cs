@@ -9,23 +9,23 @@ public class MobBehaviour : MonoBehaviour
     public float speed;
     public SpriteRenderer sr;
     Collider2D otherObj = null;
+    public Animator animator;
+    int dirValue = 1;
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.name == "Hero")
-        {
-            otherObj = other;
-            speed = 0;
-        }
+        otherObj = other;
+        speed = 0;
+        dirValue = 0;
+        animator.SetInteger("dir", dirValue);
     }
 
     private void OnTriggerExit2D(Collider2D other)
     {
-        if (other.gameObject.name == "Hero")
-        {
-            otherObj = null;
-            speed = 4;
-        }
+        otherObj = null;
+        speed = 4;
+        dirValue = 1;
+        animator.SetInteger("dir", dirValue);
     }
 
     private void Start()
