@@ -5,25 +5,32 @@ using TMPro;
 
 public class InventoryV1 : MonoBehaviour
 {
-    public GameObject inventory;
-    public bool invState;
+    public GameObject ScreenStats;
+    public bool invState = true;
 
+    HeroCharCollision camFight;
+
+
+    private void Start()
+    {
+        camFight = gameObject.GetComponent<HeroCharCollision>();
+    }
     // Start is called before the first frame update
     private void Update()
     {
         if(Input.GetKeyUp(KeyCode.I))
         {
-            if(!invState)
+            if(!invState && !camFight.camFight.activeInHierarchy)
             {
-                inventory.SetActive(true);
+                ScreenStats.SetActive(true);
                 invState = true;
-                Debug.Log("InvFermée");
+                Debug.Log("StatsAffiché");
             }
             else
             {
-                inventory.SetActive(false);
+                ScreenStats.SetActive(false);
                 invState = false;
-                Debug.Log("InvOuvert");
+                Debug.Log("StatsCaché");
             }
         }
     }

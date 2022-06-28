@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -14,6 +15,20 @@ public class HeroCharCollision : MonoBehaviour
     public Text dialcanvasTxt;
     public GameObject camFight;
     MobBehaviour mb;
+    InventoryV1 inv;
+    GameObject Encounter;
+    public int goldKeep = 0;
+    public int xpKeep = 0;
+    public GameObject[] Pdvmainscreen;
+    Collider2D LootRemind;
+    public bool IsLootHere;
+    public int killchain = 0;
+    float killchainBonus = 1;
+    public SpriteRenderer bag;
+    public Sprite bagopen;
+    public Sprite bagclose;
+    HeroStats hstats;
+
 
 
 
@@ -41,17 +56,29 @@ public class HeroCharCollision : MonoBehaviour
         }
         if (other.gameObject.tag == "mob" && !camFight.activeInHierarchy)
         {
+            Encounter = other.gameObject;
+            inv = gameObject.GetComponent<InventoryV1>();
             print("Combat !");
-            mb = other.gameObject.GetComponent<MobBehaviour>();
             camFight.SetActive(true);
+            mb = other.GetComponent<MobBehaviour>();
             InitFight initF = camFight.GetComponent<InitFight>();
             initF.hfs.baseEnemy = other.gameObject;
             initF.initFight();
+            if (inv.ScreenStats.activeInHierarchy)
+            {
+                inv.ScreenStats.SetActive(false);
+                inv.invState = false;
+                Debug.Log("StatsCachéAuto");
+            }
         }
         if (other.gameObject.tag == "LootBag")
         {
+            mb = other.GetComponentInParent<MobBehaviour>();
             otherObj = other;
+            if (LootRemind != null)
+                LootRemind = otherObj;
             otherObj.gameObject.transform.GetChild(0).gameObject.SetActive(true);
+            bag.sprite = bagopen;
         }
     }
 
@@ -95,6 +122,8 @@ public class HeroCharCollision : MonoBehaviour
         if (other.gameObject.tag == "LootBag")
         {
             otherObj.gameObject.transform.GetChild(0).gameObject.SetActive(false);
+            bag.sprite = bagclose;
+
         }
 
     }
@@ -130,8 +159,38 @@ public class HeroCharCollision : MonoBehaviour
 
     public void ShowLoot()
     {
-        dialTxt.SetText($"Vous trouvez {mb.Gold} Pièces d'or et {mb.xp} points d'expériences !");
-        dialWorldSpace.SetActive(true);
-        Invoke("HideDialPanel", 2);
+        Destroy(otherObj.gameObject);
+        dialCanvas.SetActive(true);
+        mb = Encounter.GetComponent<MobBehaviour>();
+        for (int i = 1; i < killchain; i++)
+            killchainBonus += 0.15f;
+        if(killchain > 1)
+            dialcanvasTxt.text = $"Tu trouves {goldKeep} pièces d'or et {xpKeep} points d'expériences KillStreak x{killchainBonus}";
+        else
+            dialcanvasTxt.text = $"Tu trouves {goldKeep} pièces d'or et {xpKeep} points d'expériences";
+        Invoke("HidePnjDialPanel", 4);
+        IsLootHere = false;
+        print(goldKeep*killchainBonus);
+        print(Convert.ToInt32(goldKeep * killchainBonus));
+        hstats = gameObject.GetComponent<HeroStats>();
+        hstats.goldStats += Convert.ToInt32(goldKeep * killchainBonus);
+        hstats.xpStats += Convert.ToInt32(xpKeep * killchainBonus);
+        if (hstats.xpStats > hstats.xpforlvlUp)
+        {
+            print("Lvl up !");
+            hstats.xpStats -= Convert.ToInt32(hstats.xpforlvlUp);
+            hstats.xpforlvlUp = hstats.xpforlvlUp * 2.5f;
+        }
+        else
+            print("No Level up");
+        hstats.XpSetup();
+        print(goldKeep);
+        print(xpKeep);
+        goldKeep = 0;
+        xpKeep = 0;
+        print(goldKeep);
+        print(xpKeep);
+        killchain = 0;
+        killchainBonus = 1;
     }
 }

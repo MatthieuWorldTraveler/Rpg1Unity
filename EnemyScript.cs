@@ -7,8 +7,8 @@ public class EnemyScript : MonoBehaviour
     public int force = 1;
     public GameObject hero;
     public GameObject AtkPos;
-
-
+    public GameObject heromainscreen;
+    HeroCharCollision hcc;
 
     public GameObject[] PDV;
     HeroFightScript hfs;
@@ -17,6 +17,7 @@ public class EnemyScript : MonoBehaviour
 
     private void Start()
     {
+        hcc = heromainscreen.GetComponent<HeroCharCollision>();
         InitialPos = transform.position;
         hfs = hero.GetComponent<HeroFightScript>();
     }
@@ -62,10 +63,15 @@ public class EnemyScript : MonoBehaviour
 
     public void PertePvHero()
     {
+        force = Random.Range(1, 4);
         for (int i = 0; i < force; i++)
         {
-            hfs.vie--;
-            hfs.PDV[hfs.vie].SetActive(false);
+            if (hfs.vie > 0)
+            {
+                hfs.vie--;
+                hfs.PDV[hfs.vie].SetActive(false);
+                hcc.Pdvmainscreen[hfs.vie].SetActive(false);
+            }
         }
     }
 

@@ -14,6 +14,9 @@ public class MobBehaviour : MonoBehaviour
     public GameObject loot;
     public int Gold;
     public int xp;
+    public GameObject LootBag;
+    HeroCharCollision hcc;
+    public GameObject Heromainscreen;
 
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -33,6 +36,8 @@ public class MobBehaviour : MonoBehaviour
 
     private void Start()
     {
+        InitReward();
+        hcc = Heromainscreen.gameObject.GetComponent<HeroCharCollision>();
         dir = Vector2.right;
     }
 
@@ -53,6 +58,28 @@ public class MobBehaviour : MonoBehaviour
 
     public void dropLoot()
     {
-        Instantiate(loot, transform.position, Quaternion.identity);
+        if (!hcc.IsLootHere)
+        {
+            LootBag = Instantiate(loot, transform.position, Quaternion.identity);
+            hcc.IsLootHere = true;
+        }
+        else
+        {
+            hcc.dialWorldSpace.SetActive(true);
+            hcc.dialTxt.text = "Loot rangé dans le sac le plus proche !";
+            Invoke("HideDialPanel", 2);
+        }
     }
+
+    void HideDialPanel()
+    {
+        hcc.dialWorldSpace.SetActive(false);
+    }
+
+    public void InitReward()
+    {
+        Gold = Random.Range(25, 100);
+        xp = Random.Range(30, 70);
+    }
+
 }

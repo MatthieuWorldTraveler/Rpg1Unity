@@ -5,6 +5,7 @@ using UnityEngine;
 public class HeroFightScript : MonoBehaviour
 {
     public int vie = 10;
+    
     public int force = 1;
 
     public GameObject enemy;
@@ -13,17 +14,20 @@ public class HeroFightScript : MonoBehaviour
     public GameObject FightBtn;
     public GameObject camFight;
     public GameObject baseEnemy;
-
     public GameObject[] PDV;
-
     public bool PlayerTurn = true;
-    
+    public GameObject heromainscreen;
+    HeroCharCollision hcc;
+    QuestTaker qt;
+    InventoryV1 inv;
 
 
     Vector3 InitialPos;
 
     private void Start()
     {
+        qt = heromainscreen.GetComponent<QuestTaker>();
+        hcc = heromainscreen.GetComponent<HeroCharCollision>();
         InitialPos = transform.position;
         enemyScript = enemy.GetComponent<EnemyScript>();
     }
@@ -57,6 +61,13 @@ public class HeroFightScript : MonoBehaviour
                 mb.dropLoot();
             }
             camFight.SetActive(false);
+            print("fight over");
+            inv = heromainscreen.gameObject.GetComponent<InventoryV1>();
+            inv.ScreenStats.SetActive(true);
+            inv.invState = true;
+            hcc.goldKeep += mb.Gold;
+            hcc.xpKeep += mb.xp;
+            hcc.killchain++;
         }
         else
         {
@@ -84,10 +95,15 @@ public class HeroFightScript : MonoBehaviour
 
     public void PertePvEn()
     {
+
+        force = Random.Range(1, 4);
         for (int i = 0; i < force; i++)
         {
-            enemyScript.vie--;
-            enemyScript.PDV[enemyScript.vie].SetActive(false);
+            if (enemyScript.vie != 0)
+            {
+                enemyScript.vie--;
+                enemyScript.PDV[enemyScript.vie].SetActive(false);
+            }
         }
     }
 }

@@ -11,19 +11,15 @@ public class QuestTaker : MonoBehaviour
     Collider2D otherObj;
     public int flowerCount = 16;
     public bool IsOver;
-    int GoldReward;
-    int XpReward;
-    int Xp;
-    int gold;
     public GameObject dialCanvas;
     public Text dialcanvasTxt;
-    public TMP_Text GoldJoueur;
-    public TMP_Text XpJoueur;
     public int QuestD = 0;
     int QId;
     int QiDOngoing = 0;
     public int QuetesEncours = 0;
     bool Q1Done;
+    HeroStats hstats;
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.tag == "Quest_Giver")
@@ -32,8 +28,6 @@ public class QuestTaker : MonoBehaviour
             QId = collision.GetComponent<QuestGiver>().quest.QuestId;
             if (QiDOngoing == 0)
                 QiDSetup();
-            GoldReward = collision.GetComponent<QuestGiver>().quest.gold;
-            XpReward = collision.GetComponent<QuestGiver>().quest.xp;   
             otherObj = collision;
             if (qg == null)
                 qg = otherObj.gameObject.GetComponent<QuestGiver>();
@@ -78,17 +72,17 @@ public class QuestTaker : MonoBehaviour
                         qg.questInfosOver[1].text = qg.questOver.description;
                         qg.questInfosOver[2].text = $"XP: {qg.quest.xp} | Gold: {qg.quest.gold}";
                         qg.questItem.SetActive(false);
-                        Xp += qg.quest.xp;
-                        gold += qg.quest.gold;
-                        GoldJoueur.text = gold.ToString();
-                        XpJoueur.text = Xp.ToString();
+                        hstats = gameObject.GetComponent<HeroStats>();
+                        hstats.goldStats += qg.quest.gold;
+                        hstats.goldTxt.SetText(hstats.goldStats.ToString());
+                        hstats.xpStats += qg.quest.gold;
+                        hstats.XpSetup();
                         QuestD = 2;
                         gameObject.GetComponent<QuestObjective>().queteFinit = false;
                         QuetesEncours = 0;
                         otherObj.gameObject.tag = "smiley";
                         QiDOngoing = 0;
                         qg.quest.isActive = false;
-                        gameObject.GetComponent<QuestObjective>().queteFinit = false;
                         if (QId == 1)
                         {
                             Q1Done = true;
