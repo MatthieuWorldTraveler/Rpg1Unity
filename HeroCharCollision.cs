@@ -28,8 +28,10 @@ public class HeroCharCollision : MonoBehaviour
     public Sprite bagopen;
     public Sprite bagclose;
     HeroStats hstats;
-
-
+    public GameObject HealCanvas;
+    HeroFightScript hfs;
+    QuestGiver qg;
+    public GameObject HeroFight;
 
 
     void OnTriggerEnter2D(Collider2D other)
@@ -80,6 +82,11 @@ public class HeroCharCollision : MonoBehaviour
             otherObj.gameObject.transform.GetChild(0).gameObject.SetActive(true);
             bag.sprite = bagopen;
         }
+        if (other.gameObject.tag == "Healer")
+        {
+            otherObj = other;
+            otherObj.gameObject.transform.GetChild(0).gameObject.SetActive(true);
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D other)
@@ -125,6 +132,11 @@ public class HeroCharCollision : MonoBehaviour
             bag.sprite = bagclose;
 
         }
+        if (other.gameObject.tag == "Healer")
+        {
+            otherObj.gameObject.transform.GetChild(0).gameObject.SetActive(false);
+            otherObj = null;
+        }
 
     }
 
@@ -146,6 +158,14 @@ public class HeroCharCollision : MonoBehaviour
             {
                 otherObj.gameObject.transform.GetChild(0).gameObject.SetActive(false);
                 ShowLoot();
+            }
+            if (otherObj.gameObject.tag == "Healer")
+            {
+                qg = otherObj.gameObject.GetComponent<QuestGiver>();
+                otherObj.gameObject.transform.GetChild(0).gameObject.SetActive(false);
+                HealCanvas.SetActive(true);
+                qg.questInfos[0].text = qg.quest.title;
+                qg.questInfos[1].text = qg.quest.description;
             }
         }
     }
@@ -193,4 +213,45 @@ public class HeroCharCollision : MonoBehaviour
         killchain = 0;
         killchainBonus = 1;
     }
+
+    public void Heal()
+    {
+        hfs = HeroFight.gameObject.GetComponent<HeroFightScript>();
+        HealCanvas.SetActive(false);
+        hstats = gameObject.GetComponent<HeroStats>();
+        if (hstats.goldStats >= 50 && hfs.vie < hfs.vieMax)
+        {
+            print("Heal possible");
+            hstats.goldStats -= 50;
+            hstats.goldTxt.text = hstats.goldStats.ToString();
+            for (int i = hfs.vie; i < hfs.vieMax; i++)
+            {
+                hfs.vie++;
+                hfs.PDV[hfs.vie-1].SetActive(true);
+                Pdvmainscreen[hfs.vie-1].SetActive(true);
+            }
+        }
+        else if (hfs.vie == hfs.vieMax)
+        {
+            print("toute sa vie");
+            dialWorldSpace.SetActive(true);
+            dialTxt.text = "Tu as déjà toute ta vie !";
+            Invoke("HideDialPanel", 2);
+        }
+        else
+        {
+            print("Pas d'or");
+            dialWorldSpace.SetActive(true);
+            dialTxt.text = "Pas assez d'or en stock !";
+            Invoke("HideDialPanel", 2);
+        }
+        print("Fin du heal");
+        HealCanvas.SetActive(false);
+    }
+
+    public void HideHealPanel()
+    {
+        HealCanvas.SetActive(false);
+    }
+
 }

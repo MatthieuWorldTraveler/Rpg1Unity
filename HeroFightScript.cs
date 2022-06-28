@@ -5,7 +5,8 @@ using UnityEngine;
 public class HeroFightScript : MonoBehaviour
 {
     public int vie = 10;
-    
+    public int vieMax = 10;
+
     public int force = 1;
 
     public GameObject enemy;
