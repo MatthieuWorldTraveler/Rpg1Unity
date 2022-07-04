@@ -14,13 +14,14 @@ public class InventoryV1 : MonoBehaviour
     private void Start()
     {
         camFight = gameObject.GetComponent<HeroCharCollision>();
+        ScreenStats.SetActive(true);
     }
     // Start is called before the first frame update
     private void Update()
     {
-        if(Input.GetKeyUp(KeyCode.I))
+        if(Input.GetKeyUp(KeyCode.I) && !camFight.camFight.activeInHierarchy)
         {
-            if(!invState && !camFight.camFight.activeInHierarchy)
+            if(!invState)
             {
                 ScreenStats.SetActive(true);
                 invState = true;

@@ -93,7 +93,7 @@ public class QuestObjective : MonoBehaviour
             if (QuestNbr == NbrItemMax)
             {
                 Debug.Log("QuestOver");
-                dialTxt.SetText("Quête finis");
+                dialTxt.SetText("Quête finie");
                 dialWorldSpace.SetActive(true);
                 Invoke("HideQuestOver", 2);
                 queteFinit = true;

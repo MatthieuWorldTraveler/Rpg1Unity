@@ -37,7 +37,7 @@ public class HeroScript : MonoBehaviour
 
     public void HandleKeys()
     {
-        if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.Z)) // Fleche haut
+        if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.Z) || Input.GetKey(KeyCode.W)) // Fleche haut
         {
             dir = Vector2.up;
             dirValue = 3;
@@ -48,7 +48,7 @@ public class HeroScript : MonoBehaviour
             dirValue = 2;
             spriteRenderer.flipX = true;
         }
-        else if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.Q)) // Fleche haut
+        else if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.Q) || Input.GetKey(KeyCode.A)) // Fleche haut
         {
             dir = Vector2.left;
             dirValue = 2;

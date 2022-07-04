@@ -1,3 +1,3 @@
-﻿public class TMPro_text
+﻿public class TMP_text
 {
 }

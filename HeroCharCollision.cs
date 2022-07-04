@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+using System.IO;
 
 public class HeroCharCollision : MonoBehaviour
 {
@@ -17,8 +19,8 @@ public class HeroCharCollision : MonoBehaviour
     MobBehaviour mb;
     InventoryV1 inv;
     GameObject Encounter;
-    public int goldKeep = 0;
-    public int xpKeep = 0;
+    public float goldKeep = 0;
+    public float xpKeep = 0;
     public GameObject[] Pdvmainscreen;
     Collider2D LootRemind;
     public bool IsLootHere;
@@ -32,7 +34,19 @@ public class HeroCharCollision : MonoBehaviour
     HeroFightScript hfs;
     QuestGiver qg;
     public GameObject HeroFight;
+    public string SceneIn;
+    public string SceneOut;
+    HeroBehaviour hb;
+    public bool NewMap;
+    public GameObject lvlup;
+    Vector2 Lastpos;
+    public int vie;
 
+    private void Start()
+    {
+        hstats = gameObject.GetComponent<HeroStats>();
+        hstats.InitAllStats();
+    }
 
     void OnTriggerEnter2D(Collider2D other)
     {
@@ -47,9 +61,11 @@ public class HeroCharCollision : MonoBehaviour
         }
         if (other.gameObject.tag == "exit")
         {
+            PlayerPrefs.SetString("NewMap", "true");
+            hstats.SaveAllStats();
             string point = other.gameObject.GetComponent<ExitBehaviour>().teleportPoint;
             PlayerPrefs.SetString("Point", point);
-            Application.LoadLevel(other.gameObject.name);
+            SceneManager.LoadScene(other.gameObject.name);
         }
         if (other.gameObject.tag == "smiley")
         {
@@ -168,6 +184,25 @@ public class HeroCharCollision : MonoBehaviour
                 qg.questInfos[1].text = qg.quest.description;
             }
         }
+        if(Input.GetKeyUp(KeyCode.Escape))
+        {
+            print("EscapeOn");
+            hb = gameObject.GetComponent<HeroBehaviour>();
+            PlayerPrefs.SetString("LastScene", SceneIn);
+            string[] PlayerStats;
+            string sr = File.ReadAllText("PlayerStats.txt");
+            Lastpos = transform.position;
+            PlayerStats = sr.Split(";"[0]);
+            Debug.Log(sr);
+            string newtext = PlayerStats[1];
+            sr = sr.Replace(newtext, Lastpos.x.ToString());
+            File.WriteAllText("PlayerStats.txt", sr);
+            newtext = PlayerStats[2];
+            sr = sr.Replace(newtext, Lastpos.y.ToString());
+            File.WriteAllText("PlayerStats.txt", sr);
+            SceneManager.LoadScene("X_PauseMenu");
+            Debug.Log(sr);
+        }
     }
 
     public void ShowDial()
@@ -195,23 +230,28 @@ public class HeroCharCollision : MonoBehaviour
         hstats = gameObject.GetComponent<HeroStats>();
         hstats.goldStats += Convert.ToInt32(goldKeep * killchainBonus);
         hstats.xpStats += Convert.ToInt32(xpKeep * killchainBonus);
+        lvlUp();
+        hstats.XpSetup();
+        goldKeep = 0;
+        xpKeep = 0;
+        killchain = 0;
+        killchainBonus = 1;
+        hstats.SaveAllStats();
+    }
+
+    public void lvlUp()
+    {
         if (hstats.xpStats > hstats.xpforlvlUp)
         {
             print("Lvl up !");
+            lvlup.SetActive(true);
+            Invoke("HidelvlUpPanel", 2);
             hstats.xpStats -= Convert.ToInt32(hstats.xpforlvlUp);
-            hstats.xpforlvlUp = hstats.xpforlvlUp * 2.5f;
+            hstats.xpforlvlUp = Math.Ceiling(hstats.xpforlvlUp * 1.2f);
+            hstats.lvlStats++;
         }
         else
-            print("No Level up");
-        hstats.XpSetup();
-        print(goldKeep);
-        print(xpKeep);
-        goldKeep = 0;
-        xpKeep = 0;
-        print(goldKeep);
-        print(xpKeep);
-        killchain = 0;
-        killchainBonus = 1;
+            print("NoLvlUp");
     }
 
     public void Heal()
@@ -254,4 +294,13 @@ public class HeroCharCollision : MonoBehaviour
         HealCanvas.SetActive(false);
     }
 
+    public void HidelvlUpPanel()
+    {
+        lvlup.SetActive(false);
+    }
+
+    private void OnApplicationQuit()
+    {
+        hstats.SaveAllStats();
+    }
 }

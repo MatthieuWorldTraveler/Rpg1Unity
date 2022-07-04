@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class EnemyScript : MonoBehaviour
 {
@@ -37,6 +38,9 @@ public class EnemyScript : MonoBehaviour
         if (hfs.vie <= 0)
         {
             print("GameOver");
+            SceneManager.LoadScene("0_StartMenu");
+            HeroStats hs = heromainscreen.gameObject.GetComponent<HeroStats>();
+            hs.ClearAllSaves();
         }
         else
         {
@@ -73,6 +77,7 @@ public class EnemyScript : MonoBehaviour
                 hcc.Pdvmainscreen[hfs.vie].SetActive(false);
             }
         }
+        hcc.vie = vie;
     }
 
 }

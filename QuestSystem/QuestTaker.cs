@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using System;
 
 public class QuestTaker : MonoBehaviour
 {
@@ -66,6 +67,7 @@ public class QuestTaker : MonoBehaviour
                 {
                     if (QuestD == 1)
                     {
+                        HeroCharCollision hcc = gameObject.GetComponent<HeroCharCollision>();
                         Debug.Log("QueteFinie");
                         qg.questPanelOver.SetActive(true);
                         qg.questInfosOver[0].text = qg.questOver.title;
@@ -75,7 +77,11 @@ public class QuestTaker : MonoBehaviour
                         hstats = gameObject.GetComponent<HeroStats>();
                         hstats.goldStats += qg.quest.gold;
                         hstats.goldTxt.SetText(hstats.goldStats.ToString());
-                        hstats.xpStats += qg.quest.gold;
+                        hstats.xpStats += qg.quest.xp;
+                        while (hstats.xpStats > hstats.xpforlvlUp)
+                        {
+                            hcc.lvlUp();
+                        }
                         hstats.XpSetup();
                         QuestD = 2;
                         gameObject.GetComponent<QuestObjective>().queteFinit = false;
