@@ -25,8 +25,8 @@ public class HeroStats : MonoBehaviour
     public string lastScene;
 
 
-    public float xpStats;
-    public float goldStats;
+    public int xpStats;
+    public int goldStats;
     HeroCharCollision hcc;
 
 
@@ -43,6 +43,8 @@ public class HeroStats : MonoBehaviour
         hfs = herofight.gameObject.GetComponent<HeroFightScript>();
         hcc = gameObject.GetComponent<HeroCharCollision>();
         XpSetup();
+        InitVie();
+
     }
 
     public void XpSetup()
@@ -108,6 +110,7 @@ public class HeroStats : MonoBehaviour
         Debug.Log(sr);
         PlayerStats = sr.Split(";"[0]);
         goldStats = Convert.ToInt32(PlayerStats[3]);
+        Debug.Log(goldStats);
         goldTxt.text = goldStats.ToString();
         xpStats = Convert.ToInt32(PlayerStats[4]);
         xpforlvlUp = Convert.ToDouble(PlayerStats[5]);
@@ -164,9 +167,6 @@ public class HeroStats : MonoBehaviour
         newtext = PlayerStats[6];
         sr = sr.Replace(newtext, "1");
         File.WriteAllText("PlayerStats.txt", sr);
-        /*newtext = PlayerStats[7];
-        sr = sr.Replace(newtext, "10");
-        File.WriteAllText("PlayerStats.txt", sr);*/
         Debug.Log(sr);
     }
 

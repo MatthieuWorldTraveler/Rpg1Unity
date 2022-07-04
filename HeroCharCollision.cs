@@ -189,19 +189,8 @@ public class HeroCharCollision : MonoBehaviour
             print("EscapeOn");
             hb = gameObject.GetComponent<HeroBehaviour>();
             PlayerPrefs.SetString("LastScene", SceneIn);
-            string[] PlayerStats;
-            string sr = File.ReadAllText("PlayerStats.txt");
-            Lastpos = transform.position;
-            PlayerStats = sr.Split(";"[0]);
-            Debug.Log(sr);
-            string newtext = PlayerStats[1];
-            sr = sr.Replace(newtext, Lastpos.x.ToString());
-            File.WriteAllText("PlayerStats.txt", sr);
-            newtext = PlayerStats[2];
-            sr = sr.Replace(newtext, Lastpos.y.ToString());
-            File.WriteAllText("PlayerStats.txt", sr);
+            hstats.SaveAllStats();
             SceneManager.LoadScene("X_PauseMenu");
-            Debug.Log(sr);
         }
     }
 
