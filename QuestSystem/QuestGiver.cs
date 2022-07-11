@@ -19,6 +19,9 @@ public class QuestGiver : MonoBehaviour
     public Text[] questInfosOver;
     public GameObject[] toHideAfterQuestCompleted;
     public GameObject[] toShowAfterQuestCompleted;
+    public AudioClip Greetings;
+    public AudioClip Farewell;
+    public AudioClip Uhm;
 
 
 

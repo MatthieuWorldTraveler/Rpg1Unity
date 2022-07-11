@@ -17,6 +17,10 @@ public class MobBehaviour : MonoBehaviour
     public GameObject LootBag;
     HeroCharCollision hcc;
     public GameObject Heromainscreen;
+    public int force;
+    public int vie;
+    public int defense;
+    HeroStats hs;
 
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -37,6 +41,7 @@ public class MobBehaviour : MonoBehaviour
     private void Start()
     {
         InitReward();
+        hs = Heromainscreen.GetComponent<HeroStats>();
         hcc = Heromainscreen.gameObject.GetComponent<HeroCharCollision>();
         dir = Vector2.right;
     }

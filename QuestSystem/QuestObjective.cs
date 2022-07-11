@@ -5,55 +5,41 @@ using UnityEngine;
 
 public class QuestObjective : MonoBehaviour
 {
-    public int QuestId;
     Collider2D otherObj;
     public GameObject InteractBtn;
-    public int QuestNbr = 0;
     QuestTag QuestItemOn;
     QuestGiver qg;
+    HeroStats hs;
     int NbrItemMax;
+    public AudioClip itempick;
 
     public GameObject dialWorldSpace;
     public TMP_Text dialTxt;
     public TMP_Text QuestItemQtyFleur;
-    public TMP_Text QuestItemQtyShell;
-    public bool queteFinit;
+    public AudioClip bell;
+
+    private void Start()
+    {
+        hs = gameObject.GetComponent<HeroStats>();
+    }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        
-        
         if (collision.gameObject.tag == "Flower")
         {
             NbrItemMax = collision.GetComponentInParent<QuestGiver>().quest.ItemQuest;
             QuestItemOn = collision.gameObject.GetComponent<QuestTag>();
-            if (QuestItemOn.ItemQuestOn && !queteFinit)
+            if (QuestItemOn.ItemQuestOn && !hs.Quetes1Over)
             {
                 otherObj = collision;
                 InteractBtn.SetActive(true);
             }
         }
-        if (collision.gameObject.tag == "shell")
-        {
-            NbrItemMax = collision.GetComponentInParent<QuestGiver>().quest.ItemQuest;
-            QuestItemOn = collision.gameObject.GetComponent<QuestTag>();
-            if (QuestItemOn.ItemQuestOn && !queteFinit)
-            {
-                otherObj = collision;
-                InteractBtn.SetActive(true);
-            }
-        }
-
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
         if (collision.gameObject.tag == "Flower")
-        {
-            InteractBtn.SetActive(false);
-            otherObj = null;
-        }
-        if (collision.gameObject.tag == "shell")
         {
             InteractBtn.SetActive(false);
             otherObj = null;
@@ -67,47 +53,28 @@ public class QuestObjective : MonoBehaviour
         {
             if (otherObj.gameObject.tag == "Flower")
             {
-                if (QuestItemOn.ItemQuestOn && !queteFinit)
+                if (QuestItemOn.ItemQuestOn && !hs.Quetes1Over)
                 {
+                    GetComponent<AudioSource>().PlayOneShot(itempick);
                     otherObj.gameObject.SetActive(false);
-                    QuestNbr++;
-                    QuestItemQtyFleur.text = QuestNbr.ToString();
+                    hs.Queteitem++;
+                    QuestItemQtyFleur.text = hs.Queteitem.ToString();
                     IsQuestOver();
                 }
-            }
-            else if (otherObj.gameObject.tag == "shell")
-            {
-                if (QuestItemOn.ItemQuestOn && !queteFinit)
-                {
-                    otherObj.gameObject.SetActive(false);
-                    QuestNbr++;
-                    QuestItemQtyShell.text = QuestNbr.ToString();
-                    IsQuestOver();
-                }
-            }
+            }           
         }
     }
 
     void IsQuestOver()
     {
-            if (QuestNbr == NbrItemMax)
+            if (hs.Queteitem == NbrItemMax)
             {
-                Debug.Log("QuestOver");
+                GetComponent<AudioSource>().PlayOneShot(bell);
                 dialTxt.SetText("Quête finie");
                 dialWorldSpace.SetActive(true);
                 Invoke("HideQuestOver", 2);
-                queteFinit = true;
-                QuestNbr = 0;
-            /*if (otherObj.gameObject.tag == "Flower")
-                    quete1Finit = true;
-            if (otherObj.gameObject.tag == "shell")
-                    quete2Finit = true;*/
+                hs.Quetes1Over = true;
             }
-            else
-                Debug.Log("QuestNotOver");
-
-            /*if (quete1Finit || quete2Finit)
-                queteFinit = true;*/
     }
 
     void HideQuestOver()

@@ -18,10 +18,10 @@ public class HeroCharCollision : MonoBehaviour
     public GameObject camFight;
     MobBehaviour mb;
     InventoryV1 inv;
-    GameObject Encounter;
+    public GameObject Encounter;
     public float goldKeep = 0;
     public float xpKeep = 0;
-    public GameObject[] Pdvmainscreen;
+    public TMP_Text Pdvmainscreen;
     Collider2D LootRemind;
     public bool IsLootHere;
     public int killchain = 0;
@@ -40,10 +40,19 @@ public class HeroCharCollision : MonoBehaviour
     public bool NewMap;
     public GameObject lvlup;
     Vector2 Lastpos;
-    public int vie;
+    public bool AnimOn;
+    BeachBehavior beach;
+    public GameObject bored;
+    public GameObject boredRot;
+    public SpriteRenderer hero;
+    public AudioClip SignBtn;
+    public AudioClip heal;
+    public AudioClip drowning;
+    public AudioClip gold;
 
     private void Start()
     {
+        
         hstats = gameObject.GetComponent<HeroStats>();
         hstats.InitAllStats();
     }
@@ -76,7 +85,6 @@ public class HeroCharCollision : MonoBehaviour
         {
             Encounter = other.gameObject;
             inv = gameObject.GetComponent<InventoryV1>();
-            print("Combat !");
             camFight.SetActive(true);
             mb = other.GetComponent<MobBehaviour>();
             InitFight initF = camFight.GetComponent<InitFight>();
@@ -102,6 +110,13 @@ public class HeroCharCollision : MonoBehaviour
         {
             otherObj = other;
             otherObj.gameObject.transform.GetChild(0).gameObject.SetActive(true);
+        }
+        if (other.gameObject.tag == "Beach")
+        {
+            AnimOn = true;
+            otherObj = other;
+            beach = otherObj.GetComponent<BeachBehavior>();
+            StartCoroutine("Drowning");
         }
     }
 
@@ -163,10 +178,11 @@ public class HeroCharCollision : MonoBehaviour
 
     void Update()
     {
-        if(Input.GetKeyUp(KeyCode.E) && otherObj != null)
+        if(Input.GetKeyUp(KeyCode.E) && otherObj != null && !AnimOn)
         {
             if (otherObj.gameObject.tag == "sign")
             {
+                GetComponent<AudioSource>().PlayOneShot(SignBtn);
                 otherObj.gameObject.transform.GetChild(0).gameObject.SetActive(false);
                 ShowDial();
             }
@@ -184,9 +200,8 @@ public class HeroCharCollision : MonoBehaviour
                 qg.questInfos[1].text = qg.quest.description;
             }
         }
-        if(Input.GetKeyUp(KeyCode.Escape))
+        if(Input.GetKeyUp(KeyCode.Escape) && !AnimOn)
         {
-            print("EscapeOn");
             hb = gameObject.GetComponent<HeroBehaviour>();
             PlayerPrefs.SetString("LastScene", SceneIn);
             hstats.SaveAllStats();
@@ -203,6 +218,7 @@ public class HeroCharCollision : MonoBehaviour
 
     public void ShowLoot()
     {
+        GetComponent<AudioSource>().PlayOneShot(gold);
         Destroy(otherObj.gameObject);
         dialCanvas.SetActive(true);
         mb = Encounter.GetComponent<MobBehaviour>();
@@ -214,8 +230,6 @@ public class HeroCharCollision : MonoBehaviour
             dialcanvasTxt.text = $"Tu trouves {goldKeep} pièces d'or et {xpKeep} points d'expériences";
         Invoke("HidePnjDialPanel", 4);
         IsLootHere = false;
-        print(goldKeep*killchainBonus);
-        print(Convert.ToInt32(goldKeep * killchainBonus));
         hstats = gameObject.GetComponent<HeroStats>();
         hstats.goldStats += Convert.ToInt32(goldKeep * killchainBonus);
         hstats.xpStats += Convert.ToInt32(xpKeep * killchainBonus);
@@ -230,17 +244,19 @@ public class HeroCharCollision : MonoBehaviour
 
     public void lvlUp()
     {
-        if (hstats.xpStats > hstats.xpforlvlUp)
+        while(hstats.xpStats > hstats.xpforlvlUp)
         {
-            print("Lvl up !");
             lvlup.SetActive(true);
-            Invoke("HidelvlUpPanel", 2);
+            Invoke("HidelvlUpPanel", 3);
             hstats.xpStats -= Convert.ToInt32(hstats.xpforlvlUp);
             hstats.xpforlvlUp = Math.Ceiling(hstats.xpforlvlUp * 1.2f);
             hstats.lvlStats++;
+            hstats.LVlUpStats++;
+            hfs.vie = hfs.vieMax;
+            Pdvmainscreen.text = "X " + hfs.vie;
         }
-        else
-            print("NoLvlUp");
+        if (hstats.LVlUpStats > 0)
+            hstats.lvlUpInit();
     }
 
     public void Heal()
@@ -250,31 +266,26 @@ public class HeroCharCollision : MonoBehaviour
         hstats = gameObject.GetComponent<HeroStats>();
         if (hstats.goldStats >= 50 && hfs.vie < hfs.vieMax)
         {
-            print("Heal possible");
+            GetComponent<AudioSource>().PlayOneShot(heal);
             hstats.goldStats -= 50;
             hstats.goldTxt.text = hstats.goldStats.ToString();
-            for (int i = hfs.vie; i < hfs.vieMax; i++)
-            {
-                hfs.vie++;
-                hfs.PDV[hfs.vie-1].SetActive(true);
-                Pdvmainscreen[hfs.vie-1].SetActive(true);
-            }
+            hfs.vie = hfs.vieMax;
+            hfs.PDV.text = "X " + hfs.vie;
+            Pdvmainscreen.text = "X " + hfs.vie;
+            
         }
         else if (hfs.vie == hfs.vieMax)
         {
-            print("toute sa vie");
             dialWorldSpace.SetActive(true);
             dialTxt.text = "Tu as déjà toute ta vie !";
             Invoke("HideDialPanel", 2);
         }
         else
         {
-            print("Pas d'or");
             dialWorldSpace.SetActive(true);
             dialTxt.text = "Pas assez d'or en stock !";
             Invoke("HideDialPanel", 2);
         }
-        print("Fin du heal");
         HealCanvas.SetActive(false);
     }
 
@@ -291,5 +302,52 @@ public class HeroCharCollision : MonoBehaviour
     private void OnApplicationQuit()
     {
         hstats.SaveAllStats();
+    }
+
+    IEnumerator DamageAnim()
+    {
+        hero.enabled = false;
+        yield return new WaitForSeconds(0.05f);
+        hero.enabled = true;
+        yield return new WaitForSeconds(0.05f);
+        hero.enabled = false;
+        yield return new WaitForSeconds(0.05f);
+        hero.enabled = true;
+        yield return new WaitForSeconds(0.05f);
+        hero.enabled = false;
+        yield return new WaitForSeconds(0.05f);
+        hero.enabled = true;
+        yield return new WaitForSeconds(0.05f);
+    }
+
+    IEnumerator Drowning()
+    {
+        GetComponent<AudioSource>().PlayOneShot(drowning);
+        yield return new WaitForSeconds(0.5f);
+        transform.position = beach.respawn.transform.position;
+        yield return new WaitForSeconds(0.05f);
+        StartCoroutine("DamageAnim");
+        yield return new WaitForSeconds(0.5f);
+        StartCoroutine("Bored");
+        yield return new WaitForSeconds(0.15f);
+    }
+
+    IEnumerator Bored()
+    {
+        bored.SetActive(true);
+        boredRot.transform.Rotate(0, 0, 25f);
+        yield return new WaitForSeconds(0.2f);
+        boredRot.transform.Rotate(0, 0, 0);
+        yield return new WaitForSeconds(0.2f);
+        boredRot.transform.Rotate(0, 0, 25f);
+        yield return new WaitForSeconds(0.2f);
+        boredRot.transform.Rotate(0, 0, 0);
+        yield return new WaitForSeconds(0.2f);
+        boredRot.transform.Rotate(0, 0, 25f);
+        yield return new WaitForSeconds(0.2f);
+        boredRot.transform.Rotate(0, 0, 0);
+        yield return new WaitForSeconds(0.2f);
+        bored.SetActive(false);
+        AnimOn = false;
     }
 }

@@ -40,6 +40,7 @@ public class StartMenu : MonoBehaviour
     {
         SceneManager.LoadScene(PlayerPrefs.GetString("LastScene", "1_BourgPalette"));
         hs.InitAllStats();
+        hs.SaveAllStats();      
     }
 
     public void RestartGame()

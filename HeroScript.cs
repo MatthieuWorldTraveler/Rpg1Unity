@@ -16,6 +16,8 @@ public class HeroScript : MonoBehaviour
 
     HeroCharCollision hcc;
 
+    int lastkey;
+
 
     Vector2 dir;
     int dirValue = 0; // 0 idle, 1 down 2 side 3 up
@@ -37,34 +39,60 @@ public class HeroScript : MonoBehaviour
 
     public void HandleKeys()
     {
-        if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.Z) || Input.GetKey(KeyCode.W)) // Fleche haut
+
+        if ((Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.Z) || Input.GetKey(KeyCode.W)) && !hcc.AnimOn) // Fleche haut
         {
             dir = Vector2.up;
             dirValue = 3;
+            lastkey = 3;
         }
-        else if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D)) // Fleche haut
+        else if ((Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D)) && !hcc.AnimOn) // Fleche haut
         {
             dir = Vector2.right;
             dirValue = 2;
-            spriteRenderer.flipX = true;
+            lastkey = 2;
         }
-        else if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.Q) || Input.GetKey(KeyCode.A)) // Fleche haut
+        else if ((Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.Q) || Input.GetKey(KeyCode.A)) && !hcc.AnimOn) // Fleche haut
         {
             dir = Vector2.left;
-            dirValue = 2;
-            spriteRenderer.flipX = false;
+            dirValue = 4;
+            lastkey = 4;
 
         }
-        else if (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S)) // Fleche haut
+        else if ((Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S)) && !hcc.AnimOn) // Fleche haut
         {
             dir = Vector2.down;
             dirValue = 1;
+            lastkey = 1;
+        }
+        else if (lastkey == 1)
+        {
+            dirValue = 5;
+            dir = Vector2.zero;
+        }
+        else if (lastkey == 2)
+        {
+            dirValue = 6;
+            dir = Vector2.zero;
+        }
+        else if (lastkey == 3)
+        {
+            dirValue = 7;
+            dir = Vector2.zero;
+        }
+        else if (lastkey == 4)
+        {
+            dirValue = 8;
+            dir = Vector2.zero;
+        }
+        if(Input.GetKey(KeyCode.LeftShift))
+        {
+            moveSpeed = 15.0f;
         }
         else
         {
-            dir = Vector2.zero;
-            dirValue = 0;
-        }  
+            moveSpeed = 10.0f;
+        }
     }
 
     public void HandleMove()
